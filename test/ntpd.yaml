@@ -1,0 +1,85 @@
+heat_template_version: 2015-10-15
+
+parameter_groups:
+
+parameters:
+
+  key:
+    type: string
+    constraints:
+      - custom_constraint: nova.keypair
+
+  image:
+    type: string
+    constraints:
+      - custom_constraint: glance.image
+
+  flavor:
+    type: string
+    constraints:
+      - custom_constraint: nova.flavor
+
+  public_network:
+    type: string
+    constraints:
+      - custom_constraint: neutron.network
+
+  dns_nameservers:
+    type: comma_delimited_list
+    description: List of DNS servers
+    default:
+      - 8.8.8.8
+
+  name:
+    type: string
+    default: ntpd
+
+resources:
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+      name: { get_param: name }
+      external_gateway_info:
+        network: { get_param: public_network }
+
+  simple_networking1:
+    type: Evoila::IaaS::NetworkLayout::Simple
+    properties:
+      name: { get_param: name }
+      network_cidr: 192.168.0.0/24
+      router: { get_resource: router }
+      dns_nameservers: { get_param: dns_nameservers }
+
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: { get_param: name }
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+
+  cluster:
+    type: Evoila::IaaS::Cluster::Basic
+    properties:
+      count: 1
+      name: { get_param: name }
+      key: { get_param: key }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      security_groups:
+        - { get_resource: security_group }
+      subnets:
+        - { get_attr: [simple_networking1, subnet] }
+      timeout: 500
+      extras:
+        volume_count: 0
+        volume_size: 0
+
+  ntpd:
+    type: Evoila::Deployment::NTPD
+    properties:
+      server_map: { get_attr: [ cluster, attributes_id ] }
+      servers:
+        - pool.ubuntu.com
+
+outputs:

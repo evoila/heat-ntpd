@@ -1,0 +1,6 @@
+[submodule "test/lib/heat-iaas"]
+	path = test/lib/heat-iaas
+	url = git@github.com:evoila/heat-iaas.git
+[submodule "test/lib/heat-common"]
+	path = test/lib/heat-common
+	url = git@github.com:evoila/heat-common.git
