@@ -1,0 +1,2 @@
+resource_registry:
+  "Evoila::Deployment::NTPD": src/deploy-ntpd-centos.yaml
