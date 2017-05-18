@@ -80,6 +80,6 @@ resources:
     properties:
       server_map: { get_attr: [ cluster, attributes_id ] }
       servers:
-        - pool.ubuntu.com
+        - pool.ntp.org
 
 outputs:
