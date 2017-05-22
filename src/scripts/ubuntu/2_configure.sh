@@ -11,11 +11,11 @@ filegen clockstats file clockstats type day enable
 
 EOF
 
-LENGTH=$(echo ${SERVERS} | /usr/bin/jq 'length')
+LENGTH=$(echo ${SERVERS} | jq 'length')
 LAST_INDEX=$((LENGTH-1))
 
 for I in `seq 0 $LAST_INDEX`; do
-  ADDR=$(echo $SERVERS | /usr/bin/jq -r ".[$I]" )
+  ADDR=$(echo $SERVERS | jq -r ".[$I]" )
 
   cat <<EOF >> /etc/ntp.conf
 pool $ADDR iburst
